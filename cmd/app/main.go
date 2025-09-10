@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -85,7 +88,26 @@ func main() {
 		IdleTimeout:  1 * time.Minute,
 	}
 
-	if err := server.ListenAndServe(); err != nil {
-		log.Error("server failed to start", "error", err)
+	go func() {
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Error("server failed to start", "error", err)
+			os.Exit(1)
+		}
+	}()
+
+	// Graceful shutdown
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Info("shutting down server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Error("server shutdown failed", "error", err)
+		os.Exit(1)
 	}
+
+	log.Info("server exited properly")
 }

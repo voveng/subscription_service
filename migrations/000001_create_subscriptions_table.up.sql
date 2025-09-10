@@ -3,6 +3,6 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     service_name VARCHAR(255) NOT NULL,
     price INT NOT NULL,
     user_id UUID NOT NULL,
-    start_date VARCHAR(7) NOT NULL, -- MM-YYYY
-    end_date VARCHAR(7) -- MM-YYYY
+    start_date DATE NOT NULL, -- MM-YYYY
+    end_date DATE -- MM-YYYY
 );

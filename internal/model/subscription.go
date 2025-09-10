@@ -12,3 +12,18 @@ type Subscription struct {
 	StartDate    string    `json:"start_date" binding:"required"` // Format: MM-YYYY
 	EndDate      *string   `json:"end_date,omitempty"`           // Format: MM-YYYY
 }
+
+type CreateSubscriptionRequest struct {
+	ServiceName string    `json:"service_name" binding:"required"`
+	Price       int       `json:"price" binding:"required,gte=0"`
+	UserID      uuid.UUID `json:"user_id" binding:"required"`
+	StartDate   string    `json:"start_date" binding:"required"` // Format: MM-YYYY
+	EndDate     *string   `json:"end_date,omitempty"`           // Format: MM-YYYY
+}
+
+type UpdateSubscriptionRequest struct {
+	ServiceName *string `json:"service_name,omitempty"`
+	Price       *int    `json:"price,omitempty,gte=0"`
+	StartDate   *string `json:"start_date,omitempty"` // Format: MM-YYYY
+	EndDate     *string `json:"end_date,omitempty"`   // Format: MM-YYYY
+}
